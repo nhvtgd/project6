@@ -163,8 +163,8 @@ class AddressPairGenerator {
       dest = ( dest + mask ) & mask; // he's walking backward...
       destResidue = destResidue - 1.0d;
     }
-    return new AddressPair(uniGen.mangle(1+((source+expGen.getRand()) & mask)),
-                          uniGen.mangle(1+((dest+expGen.getRand()) & mask)));
+    return new AddressPair(uniGen.mangle(1+((source+expGen.getRand()) & mask)) & mask,
+                          uniGen.mangle(1+((dest+expGen.getRand()) & mask)) & mask);
   }
 }
 
