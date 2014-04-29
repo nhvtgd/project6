@@ -1,4 +1,4 @@
-import deuce.Atomic;
+import org.deuce.Atomic;
 
 // run with:
 // java -javaagent:deuceAgent-1.3.0.jar -cp . AtomicQueueApp numMilliseconds numQueues numWorkers
