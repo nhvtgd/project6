@@ -1,5 +1,3 @@
-import java.util.Set;
-
 
 public interface IHashTable<K,V> {
 	boolean add(K key, V value);

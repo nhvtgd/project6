@@ -1,5 +1,3 @@
-import java.util.Set;
-
 
 public interface IHashSet<K> {
 	boolean add(K item);

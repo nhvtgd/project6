@@ -1,13 +1,13 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class SimpleHistogram<T>  implements IHistorgram<T>{
-	Map<Long, Integer> histogram;
+	ConcurrentHashMap<Long, Integer> histogram;
 	
 	public SimpleHistogram() {
-		histogram = new HashMap<Long, Integer>();
+		histogram = new ConcurrentHashMap<Long, Integer>();
 	}
+	
 	@Override
 	public void add(T item) {
 		if (!histogram.containsKey(item)) {

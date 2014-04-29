@@ -18,7 +18,7 @@ public class SerialFireWallTest {
 	    PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
 	    PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
 	    IHashTable<Integer, Boolean> blackListTable = new JavaHashMapWrapper<Integer, Boolean>();
-	    IHashTable<Integer, SerialSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, SerialSet<Integer>>();
+	    IHashTable<Integer, IHashSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, IHashSet<Integer>>();
 	    IHistorgram<Long> histogram = new SimpleHistogram<Long>();
 	    
 	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram);

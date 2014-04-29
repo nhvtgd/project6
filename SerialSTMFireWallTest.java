@@ -21,7 +21,7 @@ public class SerialSTMFireWallTest {
 		PaddedPrimitiveNonVolatile<Boolean> doneWorker = new PaddedPrimitiveNonVolatile<Boolean>(false);
 	    PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
 	    IHashTable<Integer, Boolean> blackListTable = new JavaHashMapWrapper<Integer, Boolean>();
-	    IHashTable<Integer, SerialSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, SerialSet<Integer>>();
+	    IHashTable<Integer, IHashSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, IHashSet<Integer>>();
 	    IHistorgram<Long> histogram = new SimpleHistogram<Long>();
 	    
 	    WaitFreeQueue<Packet>[] queueBank = new WaitFreeQueue[numSources];

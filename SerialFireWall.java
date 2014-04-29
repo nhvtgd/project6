@@ -1,15 +1,14 @@
-import deuce.Atomic;
 
 public class SerialFireWall {
 	PaddedPrimitiveNonVolatile<Boolean> done;
 	final IHashTable<Integer, Boolean> blackListTable;
-	final IHashTable<Integer, SerialSet<Integer>> acceptanceList;
+	final IHashTable<Integer, IHashSet<Integer>> acceptanceList;
 	final IHistorgram<Long> historgram;
 	long residue = 0;
 	Fingerprint fingerprint;
 	
 	public SerialFireWall(IHashTable<Integer, Boolean> blackListTable,
-			IHashTable<Integer, SerialSet<Integer>> acceptanceList,
+			IHashTable<Integer, IHashSet<Integer>> acceptanceList,
 			IHistorgram<Long> histogram){
 		this.blackListTable = blackListTable;
 		this.acceptanceList = acceptanceList;
@@ -38,18 +37,14 @@ public class SerialFireWall {
 		if (!acceptanceList.contains(pkt.config.address)) {
 			acceptanceList.add(pkt.config.address, new SerialSet<Integer>());
 		}
-		SerialSet<Integer> bucket = acceptanceList.get(pkt.config.address);
+		IHashSet<Integer> bucket = acceptanceList.get(pkt.config.address);
 		if (pkt.config.acceptingRange) {
 			for (int i = pkt.config.addressBegin; i < pkt.config.addressEnd;i++) {
-				if (!bucket.contains(i)){
-					bucket.add(i);
-				}
+				bucket.add(i);
 			}
 		} else {
 			for (int i = pkt.config.addressBegin; i < pkt.config.addressEnd;i++) {
-				if (bucket.contains(i)){
-					bucket.remove(i);
-				}
+				bucket.remove(i);
 			}
 		}
 	}

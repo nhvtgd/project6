@@ -1,11 +1,9 @@
-import java.util.HashSet;
-import java.util.Set;
-import deuce.Atomic;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class SerialSet<K> implements IHashSet<K> {
-	final Set<K> setWrapper;
+	final ConcurrentSkipListSet<K> setWrapper;
 	public SerialSet() {
-		this.setWrapper = new HashSet<K>();
+		this.setWrapper = new ConcurrentSkipListSet<K>();
 	}
 	
 	@Override
