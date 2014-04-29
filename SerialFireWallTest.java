@@ -2,16 +2,31 @@
 public class SerialFireWallTest {
 	public static void main(String[] args) {
 		final int numMilliseconds = Integer.parseInt(args[0]);
+		final int numAddressesLog = Integer.parseInt(args[1]);
+		final int numTrainsLog  = Integer.parseInt(args[2]);
+		final int meanTrainSize = Integer.parseInt(args[3]);
+		final int meanTrainsPerComm = Integer.parseInt(args[4]);
+		final int meanWindow = Integer.parseInt(args[5]);
+		final int meanCommsPerAddress = Integer.parseInt(args[6]);
+		final int meanWork = Integer.parseInt(args[7]);
+		final double  configFraction = Double.parseDouble(args[8]);
+		final double pngFraction = Double.parseDouble(args[9]); 
+		final double acceptingFraction = Double.parseDouble(args[10]);
 		StopWatch timer = new StopWatch();
-	    PacketGenerator source = new PacketGenerator(16, 14, 15, 12, 9, 5, 8840, 0.04d, 0.19d, 0.76d);
+		 PacketGenerator source = new PacketGenerator(numAddressesLog, numTrainsLog, meanTrainSize, meanTrainsPerComm,
+				 meanWindow, meanCommsPerAddress, meanWork, configFraction, pngFraction, acceptingFraction);
 	    PaddedPrimitiveNonVolatile<Boolean> done = new PaddedPrimitiveNonVolatile<Boolean>(false);
 	    PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
-	    IHashTable<Integer, Integer> blackListTable = new JavaHashMapWrapper<Integer, Integer>();
+	    IHashTable<Integer, Boolean> blackListTable = new JavaHashMapWrapper<Integer, Boolean>();
 	    IHashTable<Integer, SerialSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, SerialSet<Integer>>();
-	    IHistorgram<Integer> histogram = new SimpleHistogram<Integer>();
+	    IHistorgram<Long> histogram = new SimpleHistogram<Long>();
 	    
-	    SerialFireWall workerData = new SerialFireWall(done, source, blackListTable, acceptanceList, histogram);
-	    Thread workerThread = new Thread(workerData);
+	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram);
+	    for (int i = 0; i < (1<<numAddressesLog); i++) {
+	    	serialFW.addPacket(source.getConfigPacket());
+	    }
+	    SerialFireWallWorker serialFWWorker = new SerialFireWallWorker(done, serialFW, source);
+	    Thread workerThread = new Thread(serialFWWorker);
 	    
 	    workerThread.start();
 	    timer.startTimer();
@@ -24,11 +39,11 @@ public class SerialFireWallTest {
 	      workerThread.join();
 	    } catch (InterruptedException ignore) {;}      
 	    timer.stopTimer();
-	    final long totalCount = workerData.totalPackets;
+	    final long totalCount = serialFWWorker.totalPackets;
 	    System.out.println("count: " + totalCount);
 	    System.out.println("time: " + timer.getElapsedTime());
 	    System.out.println(totalCount/timer.getElapsedTime() + " pkts / ms");
-	    histogram.display();
+	    //histogram.display();
 	    //blackListTable.display();
 	}
 }
