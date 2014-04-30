@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 
 public class SerialSTMFireWallTest {
@@ -29,7 +31,8 @@ public class SerialSTMFireWallTest {
 	        queueBank[i] = new WaitFreeQueue<Packet>(8);
 	    }
 	    
-	    Dispatcher dispatchData = new Dispatcher(numSources, doneDispatch, queueBank, source);
+	    AtomicInteger inflight = new AtomicInteger(0);
+	    Dispatcher dispatchData = new Dispatcher(inflight, numSources, doneDispatch, queueBank, source);
 	    Thread dispatchThread = new Thread(dispatchData);
 	    
 	    SerialSTMFireWall serialFW = new SerialSTMFireWall(blackListTable, acceptanceList, histogram);
@@ -40,7 +43,7 @@ public class SerialSTMFireWallTest {
 	    SerialSTMWorker[] serialFWWorker = new SerialSTMWorker[numSources];
 	    Thread[] workerThread = new Thread[numSources];
 	    for (int i = 0; i < numSources; i++) {
-	    	serialFWWorker[i] = new SerialSTMWorker(doneWorker, queueBank, serialFW,i);
+	    	serialFWWorker[i] = new SerialSTMWorker(inflight, doneWorker, queueBank, serialFW,i);
 	    	workerThread[i] = new Thread(serialFWWorker[i]);
 	    }
 	    for( int i = 0; i < numSources; i++ ) {
