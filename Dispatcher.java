@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.AtomicInteger;
+
 
 public class Dispatcher implements Runnable {
 
@@ -7,7 +9,9 @@ public class Dispatcher implements Runnable {
 	long totalPackets = 0;
 	final IQueue<Packet>[] queue;
 	final int numQueues;
+	AtomicInteger inFlight;
 	public Dispatcher(
+			AtomicInteger inFlight,
 			int numQueues,
 			PaddedPrimitiveNonVolatile<Boolean> done, 
 			WaitFreeQueue<Packet>[] queue, 
@@ -16,6 +20,7 @@ public class Dispatcher implements Runnable {
 		this.queue = queue;
 		this.source = source;
 		this.numQueues = numQueues;
+		this.inFlight = inFlight;
 	}
 	
 	@Override
@@ -28,8 +33,10 @@ public class Dispatcher implements Runnable {
 				while (!deliver) {
 					try {
 						queue[i].enq(nextPacket);
+						inFlight.getAndIncrement();
 						deliver = true;
 						totalPackets ++;
+						while (inFlight.get() >= 256) {;}
 					} catch (FullException e) {;}
 				}
 			} 
