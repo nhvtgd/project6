@@ -1,4 +1,4 @@
-import org.deuce.Atomic;
+import deuce.Atomic;
 
 public class SerialSTMFireWall extends SerialFireWall {
 
