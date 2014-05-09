@@ -1,3 +1,4 @@
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -10,6 +11,7 @@ public class Dispatcher implements Runnable {
 	final IQueue<Packet>[] queue;
 	final int numQueues;
 	AtomicInteger inFlight;
+	Random rand;
 	public Dispatcher(
 			AtomicInteger inFlight,
 			int numQueues,
@@ -21,25 +23,28 @@ public class Dispatcher implements Runnable {
 		this.source = source;
 		this.numQueues = numQueues;
 		this.inFlight = inFlight;
+		this.rand = new Random();
 	}
 	
 	@Override
 	public void run() {
 		Packet nextPacket;
-		while (!done.value){
-			for (int i = 0; i < numQueues; i++) {
-				nextPacket = source.getPacket();
-				boolean deliver = false;
-				while (!deliver) {
-					try {
-						queue[i].enq(nextPacket);
-						inFlight.getAndIncrement();
-						deliver = true;
-						totalPackets ++;
-						while (inFlight.get() >= 256) {;}
-					} catch (FullException e) {;}
-				}
-			} 
+		while (!done.value){		
+			nextPacket = source.getPacket();
+			boolean deliver = false;
+			while (!deliver) {
+				try {
+					if (nextPacket.type == Packet.MessageType.ConfigPacket) {
+						queue[0].enq(nextPacket);
+					} else {
+						queue[1+this.rand.nextInt(this.numQueues-1)].enq(nextPacket);							
+					}
+					inFlight.getAndIncrement();
+					deliver = true;
+					totalPackets ++;
+					while (inFlight.get() >= 256) {;}
+				} catch (FullException e) {;}
+			}			
 		}
 	}
 }
