@@ -1,9 +1,10 @@
+import java.util.HashSet;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 public class SerialSet<K> implements IHashSet<K> {
-	final ConcurrentSkipListSet<K> setWrapper;
+	final HashSet<K> setWrapper;
 	public SerialSet() {
-		this.setWrapper = new ConcurrentSkipListSet<K>();
+		this.setWrapper = new HashSet<K>();
 	}
 	
 	@Override

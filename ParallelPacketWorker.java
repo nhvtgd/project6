@@ -2,22 +2,22 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-public class SerialSTMWorker implements Runnable{
-	final SerialSTMFireWall STM;
+public class ParallelPacketWorker implements Runnable{
+	final SerialFireWall FW;
 	final WaitFreeQueue<Packet>[] queueBank;
 	PaddedPrimitiveNonVolatile<Boolean> done;
 	Random ranGen;
 	final int threadID;
 	AtomicInteger inflight;
-	public SerialSTMWorker(
+	public ParallelPacketWorker(
 			AtomicInteger inflight,
 			PaddedPrimitiveNonVolatile<Boolean> done,
 			WaitFreeQueue<Packet>[] queueBank,
-			SerialSTMFireWall STM,
+			SerialFireWall FW,
 			int threadID) {
 		this.done = done;
 		this.queueBank = queueBank;
-		this.STM = STM;
+		this.FW = FW;
 		this.ranGen = new Random();
 		this.threadID = threadID;
 		this.inflight = inflight;
@@ -30,12 +30,12 @@ public class SerialSTMWorker implements Runnable{
 		} else {
 			this.queueBank[queueNum].lock.unlock();
 			while (true) {
+				this.queueBank[queueNum].lock.lock();
 				try {
-					this.queueBank[queueNum].lock.lock();
 					pkt = this.queueBank[queueNum].deq();
 					if (pkt != null) {
 						inflight.getAndDecrement();
-						STM.addPacket(pkt);
+						FW.addPacket(pkt);
 					}
 				} catch (EmptyException e) {			
 					return true;
@@ -60,7 +60,5 @@ public class SerialSTMWorker implements Runnable{
 	    while( !empty ) {
 	    	empty = runWrapper(threadID);	       
 	    }
-	    
-	 }	 
-				
+	  }
 }

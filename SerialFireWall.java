@@ -32,7 +32,7 @@ public class SerialFireWall {
 	}	
 	
 	
-	private void processConfigPacket(Packet pkt) {
+	protected void processConfigPacket(Packet pkt) {
 		blackListTable.add(pkt.config.address, pkt.config.personaNonGrata);
 		if (!acceptanceList.contains(pkt.config.address)) {
 			acceptanceList.add(pkt.config.address, new SerialSet<Integer>());
@@ -50,7 +50,7 @@ public class SerialFireWall {
 	}
 	
 	
-	private void processDataPacket(Packet pkt) {
+	protected void processDataPacket(Packet pkt) {
 		long checkSum = 0;
 		if (blackListTable.contains(pkt.header.source) && 
 				!blackListTable.get(pkt.header.source) 	&& 

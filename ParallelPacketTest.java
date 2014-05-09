@@ -1,8 +1,7 @@
 import java.util.concurrent.atomic.AtomicInteger;
 
 
-
-public class SerialSTMFireWallTest {
+public class ParallelPacketTest {
 	public static void main(String[] args) {
 		final int numMilliseconds = Integer.parseInt(args[0]);
 		final int numAddressesLog = Integer.parseInt(args[1]);
@@ -26,26 +25,30 @@ public class SerialSTMFireWallTest {
 	    IHashTable<Integer, IHashSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, IHashSet<Integer>>();
 	    IHistorgram<Long> histogram = new SimpleHistogram<Long>();
 	    
-	    WaitFreeQueue<Packet>[] queueBank = new WaitFreeQueue[numSources];
-	    for(int i = 0; i < numSources; i++) {
-	        queueBank[i] = new WaitFreeQueue<Packet>(8);
+	    WaitFreeQueue<Packet>[] packetQueue = new WaitFreeQueue[numSources-1];
+	    for(int i = 0; i < numSources-1; i++) {
+	        packetQueue[i] = new WaitFreeQueue<Packet>(8);
 	    }
+	    WaitFreeQueue<Packet> configQueue = new WaitFreeQueue<Packet>(48);
 	    
 	    AtomicInteger inflight = new AtomicInteger(0);
-	    Dispatcher dispatchData = new Dispatcher(inflight, numSources, doneDispatch, queueBank, source);
+	    Dispatcher dispatchData = new Dispatcher(inflight, numSources-1, doneDispatch, packetQueue, configQueue, source);
 	    Thread dispatchThread = new Thread(dispatchData);
 	    
-	    SerialSTMFireWall serialFW = new SerialSTMFireWall(blackListTable, acceptanceList, histogram);
+	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram);
 	    for (int i = 0; i < (1<<numAddressesLog); i++) {
 	    	serialFW.addPacket(source.getConfigPacket());
 	    }
 	    
-	    SerialSTMWorker[] serialFWWorker = new SerialSTMWorker[numSources];
+	    ParallelPacketWorker[] parallelFWWorker = new ParallelPacketWorker[numSources-1];
 	    Thread[] workerThread = new Thread[numSources];
-	    for (int i = 0; i < numSources; i++) {
-	    	serialFWWorker[i] = new SerialSTMWorker(inflight, doneWorker, queueBank, serialFW,i);
-	    	workerThread[i] = new Thread(serialFWWorker[i]);
+	    for (int i = 0; i < numSources-1; i++) {
+	    	parallelFWWorker[i] = new ParallelPacketWorker(inflight, doneWorker, packetQueue, serialFW,i);
+	    	workerThread[i+1] = new Thread(parallelFWWorker[i]);
 	    }
+	    
+	    ConfigWorker configWorker = new ConfigWorker(inflight, doneWorker, configQueue, serialFW,0);
+	    workerThread[0] = new Thread(configWorker);
 	    for( int i = 0; i < numSources; i++ ) {
 	        workerThread[i].start();
 	    }
@@ -78,4 +81,3 @@ public class SerialSTMFireWallTest {
 	    //blackListTable.display();
 	}
 }
-

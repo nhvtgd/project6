@@ -12,7 +12,6 @@ public class SerialFireWallWorker implements Runnable{
 	}
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
 		while (!done.value) {
 			Packet pkt = source.getPacket();
 			totalPackets ++;

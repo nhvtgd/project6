@@ -1,9 +1,10 @@
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class JavaHashMapWrapper<K, V> implements IHashTable<K, V> {
-	ConcurrentHashMap<K,V> map;
+	HashMap<K,V> map;
 	public JavaHashMapWrapper() {
-		map = new ConcurrentHashMap<K, V>();
+		map = new HashMap<K, V>();
 	}
 	
 	@Override

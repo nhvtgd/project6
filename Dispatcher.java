@@ -8,7 +8,8 @@ public class Dispatcher implements Runnable {
 	final PacketGenerator source;
 	long fingerPrint = 0;
 	long totalPackets = 0;
-	final IQueue<Packet>[] queue;
+	final IQueue<Packet>[] packetQueue;
+	final IQueue<Packet> configQueue;
 	final int numQueues;
 	AtomicInteger inFlight;
 	Random rand;
@@ -16,10 +17,12 @@ public class Dispatcher implements Runnable {
 			AtomicInteger inFlight,
 			int numQueues,
 			PaddedPrimitiveNonVolatile<Boolean> done, 
-			WaitFreeQueue<Packet>[] queue, 
+			WaitFreeQueue<Packet>[] packetQueue,
+			WaitFreeQueue<Packet> configQueue,
 			PacketGenerator source) {
 		this.done = done;
-		this.queue = queue;
+		this.packetQueue= packetQueue;
+		this.configQueue = configQueue;
 		this.source = source;
 		this.numQueues = numQueues;
 		this.inFlight = inFlight;
@@ -35,9 +38,9 @@ public class Dispatcher implements Runnable {
 			while (!deliver) {
 				try {
 					if (nextPacket.type == Packet.MessageType.ConfigPacket) {
-						queue[0].enq(nextPacket);
+						configQueue.enq(nextPacket);
 					} else {
-						queue[1+this.rand.nextInt(this.numQueues-1)].enq(nextPacket);							
+						packetQueue[this.rand.nextInt(this.numQueues)].enq(nextPacket);							
 					}
 					inFlight.getAndIncrement();
 					deliver = true;
