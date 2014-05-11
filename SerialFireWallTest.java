@@ -20,8 +20,8 @@ public class SerialFireWallTest {
 	    IHashTable<Integer, Boolean> blackListTable = new JavaHashMapWrapper<Integer, Boolean>();
 	    IHashTable<Integer, IHashSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, IHashSet<Integer>>();
 	    IHistorgram<Long> histogram = new SimpleHistogram<Long>();
-	    
-	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram);
+	    CachePNG cache = new CachePNG(128);
+	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram,cache);
 	    for (int i = 0; i < (1<<numAddressesLog); i++) {
 	    	serialFW.addPacket(source.getConfigPacket());
 	    }
