@@ -22,8 +22,6 @@ public class SimpleHistogram<T>  implements IHistorgram<T>{
 		int maxValue = 0;
 		Long maxItem = 0L;
 		for (Long item : histogram.keySet()) {
-			System.out.println(String.format("Item %d Counter %d", item, histogram.get(item)));
-			System.out.println(histogram.get(item));
 			if (histogram.get(item) > maxValue) {
 				maxValue = histogram.get(item);
 				maxItem = item;
