@@ -3,17 +3,19 @@ public class SerialFireWall {
 	PaddedPrimitiveNonVolatile<Boolean> done;
 	final IHashTable<Integer, Boolean> blackListTable;
 	final IHashTable<Integer, IHashSet<Integer>> acceptanceList;
+	final ICachePNG cache;
 	final IHistorgram<Long> historgram;
 	long residue = 0;
 	Fingerprint fingerprint;
 	
 	public SerialFireWall(IHashTable<Integer, Boolean> blackListTable,
 			IHashTable<Integer, IHashSet<Integer>> acceptanceList,
-			IHistorgram<Long> histogram){
+			IHistorgram<Long> histogram, ICachePNG cache){
 		this.blackListTable = blackListTable;
 		this.acceptanceList = acceptanceList;
 		this.historgram = histogram;
 		fingerprint = new Fingerprint();
+		this.cache = cache;
 	}
 	
 	
@@ -34,6 +36,7 @@ public class SerialFireWall {
 	
 	protected void processConfigPacket(Packet pkt) {
 		blackListTable.add(pkt.config.address, pkt.config.personaNonGrata);
+		this.cache.add(pkt.config.address, pkt.config.personaNonGrata);
 		if (!acceptanceList.contains(pkt.config.address)) {
 			acceptanceList.add(pkt.config.address, new SerialSet<Integer>());
 		}
@@ -51,6 +54,9 @@ public class SerialFireWall {
 	
 	
 	protected void processDataPacket(Packet pkt) {
+		if (this.cache.isBad(pkt.header.source)) {
+			return;
+		}
 		long checkSum = 0;
 		if (blackListTable.contains(pkt.header.source) && 
 				!blackListTable.get(pkt.header.source) 	&& 
