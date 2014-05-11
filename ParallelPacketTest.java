@@ -27,9 +27,9 @@ public class ParallelPacketTest {
 	    
 	    WaitFreeQueue<Packet>[] packetQueue = new WaitFreeQueue[numSources-1];
 	    for(int i = 0; i < numSources-1; i++) {
-	        packetQueue[i] = new WaitFreeQueue<Packet>(8);
+	        packetQueue[i] = new WaitFreeQueue<Packet>(256/(numSources+1));
 	    }
-	    WaitFreeQueue<Packet> configQueue = new WaitFreeQueue<Packet>(48);
+	    WaitFreeQueue<Packet> configQueue = new WaitFreeQueue<Packet>(256-256/(numSources+1)*(numSources-1));
 	    
 	    AtomicInteger inflight = new AtomicInteger(0);
 	    Dispatcher dispatchData = new Dispatcher(inflight, numSources-1, doneDispatch, packetQueue, configQueue, source);

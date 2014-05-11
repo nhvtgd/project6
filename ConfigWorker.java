@@ -29,7 +29,6 @@ public class ConfigWorker implements Runnable{
 			try {
 				pkt = this.configQueue.deq();
 				if (pkt != null) {
-					inflight.getAndDecrement();
 					FW.addPacket(pkt);
 				}
 			} catch (EmptyException e) {			

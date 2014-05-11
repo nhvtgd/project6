@@ -34,7 +34,6 @@ public class ParallelPacketWorker implements Runnable{
 				try {
 					pkt = this.queueBank[queueNum].deq();
 					if (pkt != null) {
-						inflight.getAndDecrement();
 						FW.addPacket(pkt);
 					}
 				} catch (EmptyException e) {			

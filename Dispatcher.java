@@ -42,10 +42,9 @@ public class Dispatcher implements Runnable {
 					} else {
 						packetQueue[this.rand.nextInt(this.numQueues)].enq(nextPacket);							
 					}
-					inFlight.getAndIncrement();
+					
 					deliver = true;
-					totalPackets ++;
-					while (inFlight.get() >= 256) {;}
+					totalPackets ++;					
 				} catch (FullException e) {;}
 			}			
 		}
