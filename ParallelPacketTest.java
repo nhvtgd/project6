@@ -35,7 +35,7 @@ public class ParallelPacketTest {
 	    Dispatcher dispatchData = new Dispatcher(inflight, numSources-1, doneDispatch, packetQueue, configQueue, source);
 	    Thread dispatchThread = new Thread(dispatchData);
 	    
-	    CachePNG cache = new CachePNG(128);
+	    CachePNG cache = new CachePNG(64);
 	    SerialFireWall serialFW = new SerialFireWall(blackListTable, acceptanceList, histogram, cache);
 	    for (int i = 0; i < (1<<numAddressesLog); i++) {
 	    	serialFW.addPacket(source.getConfigPacket());
