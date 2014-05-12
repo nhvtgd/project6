@@ -1,20 +1,34 @@
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class SimpleHistogram<T>  implements IHistorgram<T>{
 	ConcurrentHashMap<Long, Integer> histogram;
-	
+	ReentrantLock[] Lock;
 	public SimpleHistogram() {
 		histogram = new ConcurrentHashMap<Long, Integer>();
+		
+	}
+	
+	public SimpleHistogram(int size) {
+		histogram = new ConcurrentHashMap<Long, Integer>();
+		this.Lock = new ReentrantLock[2<<16];
+		for (int i = 0 ; i < this.Lock.length;i++) {
+			this.Lock[i] = new ReentrantLock();
+		}
 	}
 	
 	@Override
 	public void add(T item) {
-		if (!histogram.containsKey(item)) {
-			histogram.put((Long)item, 0);
+		try {
+			this.Lock[((Long) item).intValue()].lock();
+			if (!histogram.containsKey(item)) {
+				histogram.put((Long)item, 0);
+			}			
+			histogram.put((Long)item, histogram.get((Long)item)+1);
+		} finally {
+			this.Lock[((Long) item).intValue()].unlock();
 		}
-		int currentCount = histogram.get(item);
-		histogram.put((Long)item, currentCount + 1);
 	}
 
 	@Override
