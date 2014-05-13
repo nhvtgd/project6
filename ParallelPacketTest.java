@@ -23,7 +23,7 @@ public class ParallelPacketTest {
 	    PaddedPrimitive<Boolean> memFence = new PaddedPrimitive<Boolean>(false);
 	    IHashTable<Integer, Boolean> blackListTable = new JavaHashMapWrapper<Integer, Boolean>();
 	    IHashTable<Integer, IHashSet<Integer>> acceptanceList = new JavaHashMapWrapper<Integer, IHashSet<Integer>>();
-	    IHistorgram<Long> histogram = new SimpleHistogram<Long>(numAddressesLog);
+	    IHistorgram<Long> histogram = new AtomicHistogram<Long>(numAddressesLog);
 	    
 	    WaitFreeQueue<Packet>[] packetQueue = new WaitFreeQueue[numSources-1];
 	    for(int i = 0; i < numSources-1; i++) {
